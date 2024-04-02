@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_app/routes/example.dart';
 import 'package:my_app/routes/movie_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,12 +23,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _currentIndex = index;
     });
   }
-
-  static const List<Widget> screenDataList = [
-    MovieList(),
-    Text("Movies"),
-    Text("TV Shows"),
-  ];
 
   static const List<NavigationBarData> navBarDataList = [
     NavigationBarData("Home", Icons.home),
@@ -67,7 +62,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        onTap: onSelectTab,
+        //onTap: onSelectTab,
+        onTap: (index) => onSelectTab(index),
         selectedFontSize: 12,
         currentIndex: _currentIndex,
         items: navBarDataList
@@ -75,8 +71,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icon(data.icon), label: data.text))
             .toList(),
       ),
-      body: Container(
-        child: screenDataList[_currentIndex],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: [
+          ExampleWidget(),
+          MovieList(),
+          Text("TV Shows"),
+        ],
       ),
     );
   }

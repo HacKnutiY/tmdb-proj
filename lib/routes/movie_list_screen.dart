@@ -8,31 +8,22 @@ class MovieList extends StatefulWidget {
   State<MovieList> createState() => _MovieListState();
 }
 
-class SearchFieldWidget extends StatefulWidget {
-  const SearchFieldWidget({
-    super.key,
-  });
-
-  @override
-  State<SearchFieldWidget> createState() => _SearchFieldWidgetState();
-}
-
 class MovieData {
-  late String _movieTitle;
-  late String _movieDate;
-  late String _movieSubtitle;
-  late Image _movieImage;
+  late String movieTitle;
+  late String movieDate;
+  late String movieSubtitle;
+  late Image movieImage;
   MovieData(
       {required title, required date, required subtitle, required image}) {
-    this._movieTitle = title;
-    this._movieDate = date;
-    this._movieSubtitle = subtitle;
-    this._movieImage = image;
+    this.movieTitle = title;
+    this.movieDate = date;
+    this.movieSubtitle = subtitle;
+    this.movieImage = image;
   }
 }
 
 class _MovieListState extends State<MovieList> {
-  List<MovieData> movieDataList = [
+  List<MovieData> movies = [
     MovieData(
         image: AppImages.movieVinlandPoster,
         title: "Vinland Saga",
@@ -41,25 +32,25 @@ class _MovieListState extends State<MovieList> {
             "Thorfinn is a young Iceland villager who aims to participate in wars like his retired father, Thors. One day, mercenaries are hired to kill Thors for abandoning the forces and Thorfinn sneaks in his ship to accompany him."),
     MovieData(
         image: AppImages.movieVinlandPoster,
-        title: "Vinland Saga",
+        title: "Mortal Kombat",
         date: "July 7, 2019",
         subtitle:
             "Thorfinn is a young Iceland villager who aims to participate in wars like his retired father, Thors. One day, mercenaries are hired to kill Thors for abandoning the forces and Thorfinn sneaks in his ship to accompany him."),
     MovieData(
         image: AppImages.movieVinlandPoster,
-        title: "Vinland Saga",
+        title: "Austral",
         date: "July 7, 2019",
         subtitle:
             "Thorfinn is a young Iceland villager who aims to participate in wars like his retired father, Thors. One day, mercenaries are hired to kill Thors for abandoning the forces and Thorfinn sneaks in his ship to accompany him."),
     MovieData(
         image: AppImages.movieVinlandPoster,
-        title: "Vinland Saga",
+        title: "Vikings",
         date: "July 7, 2019",
         subtitle:
             "Thorfinn is a young Iceland villager who aims to participate in wars like his retired father, Thors. One day, mercenaries are hired to kill Thors for abandoning the forces and Thorfinn sneaks in his ship to accompany him."),
     MovieData(
         image: AppImages.movieVinlandPoster,
-        title: "Vinland Saga",
+        title: "Peaky blinders",
         date: "July 7, 2019",
         subtitle:
             "Thorfinn is a young Iceland villager who aims to participate in wars like his retired father, Thors. One day, mercenaries are hired to kill Thors for abandoning the forces and Thorfinn sneaks in his ship to accompany him."),
@@ -76,85 +67,69 @@ class _MovieListState extends State<MovieList> {
         subtitle:
             "Thorfinn is a young Iceland villager who aims to participate in wars like his retired father, Thors. One day, mercenaries are hired to kill Thors for abandoning the forces and Thorfinn sneaks in his ship to accompany him.")
   ];
+  List<MovieData> filteredMovies = [];
+  TextEditingController _controller = TextEditingController();
+
+  void getFilteredMovies() {
+    String text = _controller.text.toLowerCase();
+    if (text.isNotEmpty) {
+      filteredMovies = movies
+          .where((MovieData movie) =>
+              movie.movieTitle.toLowerCase().contains(text))
+          .toList();
+    } else {
+      filteredMovies = movies;
+    }
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    filteredMovies = movies;
+
+    _controller.addListener(getFilteredMovies);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        ListView.builder(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: EdgeInsets.only(top: 60),
+          itemCount: filteredMovies.length,
+          itemExtent: 180,
+          itemBuilder: (context, index) {
+            final movieData = filteredMovies[index];
+            return MovieTile(movieData: movieData);
+          },
+        ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          child: ListView.builder(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: EdgeInsets.only(top: 60),
-            itemCount: movieDataList.length,
-            itemExtent: 180,
-            itemBuilder: (context, index) {
-              final movie = movieDataList[index];
-              return MovieTile(
-                  image: movie._movieImage,
-                  title: movie._movieTitle,
-                  date: movie._movieDate,
-                  subtitle: movie._movieSubtitle);
-            },
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+          child: TextField(
+            controller: _controller,
+            decoration: InputDecoration(
+                labelText: "Search",
+                fillColor: Colors.white,
+                filled: true,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25),
+                    borderSide: BorderSide(color: Colors.black)),
+                isCollapsed: true,
+                contentPadding: const EdgeInsets.all(14)),
           ),
         ),
-        SearchFieldWidget(),
       ],
     );
   }
 }
 
-class _SearchFieldWidgetState extends State<SearchFieldWidget> {
-  static TextEditingController _controller = TextEditingController();
-  /*
-  static List<MovieData> filter(List<MovieData> list) {
-    //variables
-    List<MovieData> newMovieList = [];
-    _controller.addListener(() {
-      if (_controller.text.isNotEmpty) {
-        for (MovieData movie in list) {
-          if (movie._movieTitle.contains(_controller.text)) {
-            newMovieList.add(movie);
-          }
-        }
-      } else {
-        newMovieList = list;
-      }
-    });
-    return newMovieList;
-  }
-*/
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: TextField(
-        controller: _controller,
-        decoration: InputDecoration(
-            labelText: "Search",
-            fillColor: Colors.white,
-            filled: true,
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25),
-                borderSide: BorderSide(color: Colors.black)),
-            isCollapsed: true,
-            contentPadding: EdgeInsets.all(14)),
-      ),
-    );
-  }
-}
-
 class MovieTile extends StatelessWidget {
-  late String _movieTitle;
-  late String _movieDate;
-  late String _movieSubtitle;
-  late Image _movieImage;
-  MovieTile(
-      {required title, required date, required subtitle, required image}) {
-    this._movieTitle = title;
-    this._movieDate = date;
-    this._movieSubtitle = subtitle;
-    this._movieImage = image;
+  late final MovieData _movieData;
+  MovieTile({
+    required movieData,
+  }) {
+    this._movieData = movieData;
   }
   @override
   Widget build(BuildContext context) {
@@ -175,7 +150,7 @@ class MovieTile extends StatelessWidget {
             ),
             clipBehavior: Clip.hardEdge,
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              _movieImage,
+              _movieData.movieImage,
               const SizedBox(
                 width: 14,
               ),
@@ -187,12 +162,12 @@ class MovieTile extends StatelessWidget {
                       height: 24,
                     ),
                     Text(
-                      _movieTitle,
+                      _movieData.movieTitle,
                       style: const TextStyle(
                           fontWeight: FontWeight.w800, fontSize: 16),
                     ),
                     Text(
-                      _movieDate,
+                      _movieData.movieDate,
                       style: const TextStyle(
                         color: Color.fromARGB(255, 131, 131, 131),
                       ),
@@ -201,7 +176,7 @@ class MovieTile extends StatelessWidget {
                       height: 20,
                     ),
                     Text(
-                      _movieSubtitle,
+                      _movieData.movieSubtitle,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       style: const TextStyle(fontWeight: FontWeight.w400),
